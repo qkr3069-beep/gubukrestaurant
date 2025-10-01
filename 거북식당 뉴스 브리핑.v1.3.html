@@ -1,0 +1,411 @@
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>거북식당 | 식단 · NEWS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" />
+  <style>
+    :root{
+      --brand-primary:#1F3A3D; --brand-primary-50:#F5F0E6; --brand-text:#1F3A3D; --brand-muted:#6B7280;
+      --brand-card:#ffffff; --brand-divider:#e5e7eb; --brand-radius:14px; --brand-shadow:0 6px 18px rgba(31,58,61,0.08);
+    }
+    html,body{ font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","맑은 고딕",Arial,"Helvetica Neue",Helvetica,sans-serif; color:var(--brand-text); background:var(--brand-primary-50); }
+    .brand-header{ background:var(--brand-primary-50); }
+    .nav-link{ color:var(--brand-text); font-weight:700; padding:8px 12px; border-radius:12px; }
+    .nav-link:hover{ background:#fff; box-shadow:var(--brand-shadow); }
+    .brand-section-title{ color:var(--brand-text); font-weight:800; border-left:6px solid var(--brand-primary); padding-left:10px; margin-bottom:14px; }
+    .brand-card{ background:var(--brand-card); border-radius:var(--brand-radius); box-shadow:var(--brand-shadow); transition:transform .12s, box-shadow .12s, background .12s; border:1px solid transparent; }
+    .brand-card:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(31,58,61,0.12); border-color:var(--brand-divider); }
+    .brand-sub{ color:var(--brand-muted); }
+    .brand-divider{ border-top:1px dashed var(--brand-divider); }
+    .chip{ display:inline-flex; align-items:center; padding:4px 10px; border-radius:9999px; border:1px solid var(--brand-divider); background:#fff; color:#475569; font-size:12px; gap:6px; }
+    .tab{ padding:8px 12px; border-radius:9999px; border:1px solid var(--brand-divider); background:#fff; cursor:pointer; font-weight:700; }
+    .tab[aria-selected="true"]{ background:var(--brand-primary); color:#fff; border-color:transparent; }
+    .ad-banner{ width:100%; border-radius:16px; overflow:hidden; box-shadow:var(--brand-shadow); background:#fff; }
+    .ad-banner img{ display:block; width:100%; height:auto; }
+    .brand-btn{ background:var(--brand-primary); color:#fff; border-radius:9999px; padding:10px 18px; font-weight:700; box-shadow:var(--brand-shadow); }
+    .brand-btn:hover{ background:#183133; }
+    .hidden{ display:none; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header -->
+  <header class="brand-header">
+    <div class="max-w-6xl mx-auto px-5 py-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img referrerpolicy="no-referrer" src="https://postfiles.pstatic.net/MjAyNTA5MjlfMTYy/MDAxNzU5MTA0NjA3OTUz.d6U-5b94oXanvaYT7my1fkSTRB-bO93yWI1aZeeXwkgg._Byt-AvsYGX-PJBebfb0Nweiu1RPDLle3ZxStLF3gucg.PNG/%EA%B7%B8%EB%A6%BC2.png?type=w966" alt="거북식당 로고" class="h-16 w-auto object-contain" onerror="this.style.display='none';" />
+      </div>
+      <nav class="flex gap-2">
+        <a href="#menu" class="nav-link">식단</a>
+        <a href="#dietitian" class="nav-link">영양사의 한마디</a>
+        <a href="#news" class="nav-link">NEWS</a>
+      </nav>
+    </div>
+    <div class="brand-divider max-w-6xl mx-auto px-5"></div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-5 py-6 space-y-10">
+    <!-- Ad banner -->
+    <a class="ad-banner block" id="adLink" href="https://omnicare.biz/service/service.php" target="_blank" rel="noopener">
+      <img referrerpolicy="no-referrer" src="https://postfiles.pstatic.net/MjAyNTEwMDFfNTgg/MDAxNzU5MjgzNTYwMDk5.iBDJbmTncpM4Nt8NSWEPyrQiLm_K4oEBKcLZokDGtBgg.by-Zz4CApW4nTXfstaSco3IxIefaCJedSt757zk02Qkg.JPEG/%EC%8A%A4%ED%82%A8_2.jpg?type=w966" alt="광고 배너">
+    </a>
+
+    <!-- Menu -->
+    <section id="menu" class="space-y-4">
+      <h2 class="brand-section-title text-xl">식단</h2>
+      <div class="flex items-center gap-2">
+        <button id="tabToday" class="tab" role="tab" aria-selected="true">오늘</button>
+        <button id="tabWeek"  class="tab" role="tab" aria-selected="false">이번 주</button>
+      </div>
+
+      <div id="panelToday" role="tabpanel" class="grid gap-4 lg:grid-cols-2">
+        <div class="brand-card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-extrabold">오늘의 식사</h3>
+            <span class="chip">오늘</span>
+          </div>
+          <div id="todayMenu" class="space-y-2"></div>
+        </div>
+
+        <div class="brand-card p-5">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-extrabold">알레르기 / 주의</h3>
+            <span class="chip" id="todayAllergyStatus">확인 중</span>
+          </div>
+          <div id="todayAllergyDetected" class="mt-2 flex flex-wrap gap-2"></div>
+          <div class="mt-4">
+            <div class="font-semibold text-sm mb-2">상세 안내</div>
+            <div id="todayAllergyList" class="space-y-2"></div>
+          </div>
+          <div class="brand-divider mt-5 mb-4"></div>
+          <div>
+            <div class="font-semibold text-sm mb-2">아이콘 안내</div>
+            <div id="legendIcons" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="panelWeek" role="tabpanel" class="hidden">
+        <div id="weekList" class="grid gap-4"></div>
+      </div>
+    </section>
+
+    <!-- Dietitian -->
+    <section id="dietitian" class="space-y-4">
+      <h2 class="brand-section-title text-xl">영양사의 한마디</h2>
+      <div class="brand-card p-5">
+        <div class="flex items-center justify-between">
+          <div class="font-extrabold">오늘의 메시지</div>
+          <span class="chip" id="nutriDateChip"></span>
+        </div>
+        <p id="nutriMessage" class="mt-3 leading-relaxed"></p>
+        <div id="nutriMeta" class="mt-3 text-sm brand-sub"></div>
+      </div>
+    </section>
+
+    <!-- NEWS -->
+    <section id="news" class="space-y-4">
+      <h2 class="brand-section-title text-xl">NEWS — 제조업 · 경제 · 사회</h2>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+        <input type="date" id="datePicker" class="px-3 py-2 rounded-xl text-[var(--brand-text)] bg-white outline-none focus:ring-2 ring-[var(--brand-primary)] w-full sm:w-auto" />
+        <button id="newsSearchBtn" class="brand-btn w-full sm:w-auto">조회</button>
+      </div>
+      <div id="news-container" class="space-y-3"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-10">
+    <div class="brand-divider max-w-6xl mx-auto px-5"></div>
+    <div class="max-w-6xl mx-auto px-5 py-6 flex items-center gap-3">
+      <img referrerpolicy="no-referrer" src="https://postfiles.pstatic.net/MjAyNTA5MjlfMTYy/MDAxNzU5MTA0NjA3OTUz.d6U-5b94oXanvaYT7my1fkSTRB-bO93yWI1aZeeXwkgg._Byt-AvsYGX-PJBebfb0Nweiu1RPDLle3ZxStLF3gucg.PNG/%EA%B7%B8%EB%A6%BC2.png?type=w966" alt="거북식당 로고" class="h-5 w-auto object-contain" onerror="this.style.display='none';" />
+      <div class="text-sm brand-sub">© <span id="year"></span> Geobuk Dining</div>
+    </div>
+  </footer>
+
+  <script>
+    const $ = s => document.querySelector(s);
+
+    /* ---------- KST date helpers ---------- */
+    function parseYMD(ymd){ const [y,m,d]=(ymd||'').split('-').map(Number); return new Date(y,(m||1)-1,d||1,0,0,0,0); }
+    function toKSTYMD(date){
+      const utc = date.getTime() + (date.getTimezoneOffset()*60000);
+      const kst = new Date(utc + 9*3600000);
+      const y=kst.getUTCFullYear(), m=String(kst.getUTCMonth()+1).padStart(2,'0'), d=String(kst.getUTCDate()).padStart(2,'0');
+      return `${y}-${m}-${d}`;
+    }
+    function addDaysYMD(ymd, n){ const dt=parseYMD(ymd); dt.setDate(dt.getDate()+n); return toKSTYMD(dt); }
+    function mondayOfWeekYMD(ymd){ const dt=parseYMD(ymd); const dow=dt.getDay()===0?7:dt.getDay(); dt.setDate(dt.getDate()-(dow-1)); return toKSTYMD(dt); }
+    const weekdayKoByYMD = ymd => ['일','월','화','수','목','금','토'][parseYMD(ymd).getDay()];
+
+    /* ---------- Google Sheet (Opensheet API: CORS OK) ---------- */
+    const SHEET_ID = "1rCvPHw5J1wOegVBJaN6oZwtZHZDTKo30CtTM-AfbUQg";
+    const OS = tab => `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(tab)}?_=${Date.now()}`;
+
+    function excelSerialToDate(serial){ const base=new Date(Date.UTC(1899,11,30)); const ms=Math.round(Number(serial))*86400000; return new Date(base.getTime()+ms); }
+    function toYMDFromAny(val){
+      if (val==null) return '';
+      const s=String(val).trim();
+      if (/^\d{4,6}$/.test(s)) { const dt=excelSerialToDate(Number(s)); if(!isNaN(dt)) return toKSTYMD(dt); }
+      let m=s.match(/^(\d{4})[-.\/\s](\d{1,2})[-.\/\s](\d{1,2})/);
+      if(m){ const y=m[1],mm=String(+m[2]).padStart(2,'0'),dd=String(+m[3]).padStart(2,'0'); return `${y}-${mm}-${dd}`; }
+      m=s.match(/^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+      if(m){ const y=m[1],mm=String(+m[2]).padStart(2,'0'),dd=String(+m[3]).padStart(2,'0'); return `${y}-${mm}-${dd}`; }
+      const dt=new Date(s); if(!isNaN(dt)) return toKSTYMD(dt);
+      return '';
+    }
+    const pick = (obj, keys) => { for (const k of keys){ if (obj[k]!=null && String(obj[k]).trim()!=="") return obj[k]; } return ""; };
+    async function fetchJSON(url){ const res=await fetch(url,{cache:"no-store"}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); }
+
+    async function loadMenusFromSheet(){
+      const rows = await fetchJSON(OS('menus'));
+      window.MENUS = rows.map(r=>({
+        date: toYMDFromAny( pick(r, ["date","DATE","날짜","Date"]) ),
+        items: String( pick(r, ["items","ITEMS","메뉴","Menu"]) || "" ),
+        allergy_tags: String( pick(r, ["allergy_tags","ALLERGY","알레르기"]) || "" ).trim()
+      })).filter(x=>x.date);
+    }
+    async function loadAllergyMetaFromSheet(){
+      const rows = await fetchJSON(OS('allergy_meta'));
+      const map = {};
+      rows.forEach(r=>{
+        const emoji = String( pick(r, ["emoji","EMOJI","아이콘"]) ).trim();
+        if(!emoji) return;
+        map[emoji] = {
+          label: String( pick(r, ["label","LABEL","라벨"]) ).trim(),
+          desc:  String( pick(r, ["desc","DESC","설명"]) ).trim()
+        };
+      });
+      window.ALLERGY_META = Object.assign({
+        "🌶": { label:"맵기",   desc:"매운 음식이 포함됩니다. 민감하시면 주의하세요." },
+        "🥜": { label:"견과류", desc:"땅콩/호두 등 견과류가 포함될 수 있습니다." },
+        "🥛": { label:"유제품", desc:"우유·치즈·버터 등 유제품이 포함될 수 있습니다." },
+        "🟢": { label:"채식",   desc:"채식 친화 메뉴입니다." },
+      }, map);
+    }
+    async function loadNutritionistFromSheet(){
+      const rows = await fetchJSON(OS('nutritionist'));
+      window.NUTRITIONIST_MESSAGES = rows.map(r=>({
+        date:   toYMDFromAny( pick(r, ["date","DATE","날짜"]) ),
+        author: String( pick(r, ["author","AUTHOR","작성자"]) || "" ).trim(),
+        message:String( pick(r, ["message","MESSAGE","메시지"]) || "" ).trim()
+      })).filter(x=>x.message);
+    }
+    async function loadSettings(){
+      try{
+        const rows = await fetchJSON(OS('settings'));
+        const map = {};
+        rows.forEach(r=>{
+          const k = String( pick(r, ["key","KEY","키"]) ).trim();
+          const v = String( pick(r, ["value","VALUE","값"]) ).trim();
+          if(k) map[k]=v;
+        });
+        if(map.ad_url) document.querySelector("#adLink").href = map.ad_url;
+      }catch(_){}
+    }
+
+    function renderLegend(){
+      const legend = $('#legendIcons'); legend.innerHTML='';
+      Object.entries(window.ALLERGY_META||{}).forEach(([emoji, meta])=>{
+        const span=document.createElement('span'); span.className='chip';
+        span.textContent = `${emoji} ${meta.label||''}`.trim();
+        legend.appendChild(span);
+      });
+    }
+    function findClosestMenu(targetYMD){
+      const menus = (window.MENUS||[]).filter(x=>x.date);
+      if (!menus.length) return {hit:null, closest:null};
+      const diff = (a,b) => Math.abs(parseYMD(a) - parseYMD(b));
+      const hit = menus.find(m => m.date === targetYMD) || null;
+      const closest = [...menus].sort((a,b)=> diff(a.date, targetYMD) - diff(b.date, targetYMD))[0] || null;
+      return {hit, closest};
+    }
+    function renderToday(){
+      const todayYMD = toKSTYMD(new Date());
+      const {hit, closest} = findClosestMenu(todayYMD);
+      let data = hit;
+      if(!data && closest){
+        const dayDiff = Math.abs((parseYMD(closest.date) - parseYMD(todayYMD)) / 86400000);
+        if (dayDiff <= 1) data = closest;
+      }
+      const menuBox = $('#todayMenu'); menuBox.innerHTML='';
+      if(!data){
+        menuBox.innerHTML = `<div class="brand-sub">오늘의 식사가 아직 등록되지 않았습니다.</div>`;
+      }else{
+        const parts = String(data.items||'').split(/\||,|·|\r?\n/).map(s=>s.trim()).filter(Boolean);
+        parts.forEach(item=>{
+          const el=document.createElement('div'); el.className='flex items-start gap-2';
+          el.innerHTML = `<span class="mt-[3px]">•</span><span>${item}</span>`;
+          menuBox.appendChild(el);
+        });
+      }
+      const status=$('#todayAllergyStatus'), detected=$('#todayAllergyDetected'), list=$('#todayAllergyList');
+      detected.innerHTML=''; list.innerHTML='';
+      const tags=(data && data.allergy_tags ? String(data.allergy_tags).split(',') : []).map(s=>s.trim()).filter(Boolean);
+      if(!tags.length){
+        status.textContent='표시 없음';
+        list.innerHTML=`<div class="brand-sub">등록된 알레르기 표시가 없습니다. 아이콘 안내를 참고해 주세요.</div>`;
+      }else{
+        status.textContent='표시 있음';
+        tags.forEach(t=>{
+          const meta=(window.ALLERGY_META||{})[t] || {label:'',desc:'해당 성분에 민감하신 분은 섭취에 주의해 주세요.'};
+          const chip=document.createElement('span'); chip.className='chip'; chip.textContent=`${t} ${meta.label||''}`.trim();
+          detected.appendChild(chip);
+          const row=document.createElement('div');
+          row.innerHTML = `<div class="flex items-start gap-3"><span class="chip shrink-0">${t} ${meta.label||''}</span><p class="brand-sub">${meta.desc||''}</p></div>`;
+          list.appendChild(row);
+        });
+      }
+      renderLegend();
+    }
+    function renderWeekMeals(){
+      const container=$('#weekList'); container.innerHTML='';
+      const todayYMD=toKSTYMD(new Date()); const monYMD=mondayOfWeekYMD(todayYMD);
+      for(let i=0;i<7;i++){
+        const ymd=addDaysYMD(monYMD,i); const it=(window.MENUS||[]).find(m=>m.date===ymd);
+        const card=document.createElement('div'); card.className='brand-card p-5';
+        const isToday=(ymd===todayYMD);
+        const header=`<div class="flex items-center justify-between mb-2"><div class="font-extrabold">${weekdayKoByYMD(ymd)}요일</div>${isToday?'<span class="chip">오늘</span>':''}</div>`;
+        let body='';
+        if(it){
+          const items=String(it.items||'').split(/\||,|·|\r?\n/).map(s=>s.trim()).filter(Boolean);
+          const lines=items.map(v=>`<div class="flex items-start gap-2"><span class="mt-[3px]">•</span><span>${v}</span></div>`).join('');
+          const tags=(it.allergy_tags||'').split(',').map(s=>s.trim()).filter(Boolean).map(t=>{
+            const meta=(window.ALLERGY_META||{})[t] || {};
+            return `<span class="chip">${t} ${meta.label||''}</span>`;
+          }).join(' ');
+          body = `<div class="space-y-2">${lines}</div><div class="mt-3 flex flex-wrap gap-2">${tags}</div>`;
+        }else{
+          body = `<div class="brand-sub">등록된 식사가 없습니다.</div>`;
+        }
+        card.innerHTML=header+body; container.appendChild(card);
+      }
+    }
+    function switchMenuTab(to){
+      if(to==='today'){
+        $('#tabToday').setAttribute('aria-selected','true'); $('#tabWeek').setAttribute('aria-selected','false');
+        $('#panelToday').classList.remove('hidden'); $('#panelWeek').classList.add('hidden'); renderToday();
+      }else{
+        $('#tabWeek').setAttribute('aria-selected','true'); $('#tabToday').setAttribute('aria-selected','false');
+        $('#panelWeek').classList.remove('hidden'); $('#panelToday').classList.add('hidden'); renderWeekMeals();
+      }
+    }
+    $('#tabToday').addEventListener('click', ()=> switchMenuTab('today'));
+    $('#tabWeek').addEventListener('click',  ()=> switchMenuTab('week'));
+
+    /* ---------- NEWS (fast + cached) ---------- */
+    const feeds = {
+      "주요 소식(국내)": "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko",
+      "주요 소식(국외)": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
+      "경제/사회": "https://news.google.com/rss/search?q=경제+OR+사회&hl=ko&gl=KR&ceid=KR:ko",
+      "제조업 소식": "https://news.google.com/rss/search?q=제조업+OR+반도체+OR+자동차+OR+배터리+OR+디스플레이+OR+조선&hl=ko&gl=KR&ceid=KR:ko"
+    };
+    const withTimeout = (p, ms) => Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), ms))]);
+    const newsKey = (category, ymd) => `news:${category}:${ymd}`;
+
+    function renderSkeleton(category){
+      const wrap = document.createElement('section');
+      wrap.innerHTML = `<h3 class="brand-section-title text-lg">${category}</h3>
+        <div class="brand-card p-4"><div class="brand-sub">불러오는 중…</div></div>`;
+      return wrap;
+    }
+
+    async function fetchRSSItems(url){
+      try{
+        const res = await withTimeout(fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, {cache:"force-cache"}), 1200);
+        if(!res.ok) throw new Error(`allorigins ${res.status}`);
+        const xmlText = await res.text();
+        const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+        const items = [...doc.querySelectorAll("item")].map(it => ({
+          title: (it.querySelector("title")?.textContent||"").trim(),
+          link: (it.querySelector("link")?.textContent||"").trim(),
+          pubDate: (it.querySelector("pubDate")?.textContent||"").trim(),
+          description: (it.querySelector("description")?.textContent||"").trim(),
+        }));
+        if(items.length) return items;
+        const entries = [...doc.querySelectorAll("entry")].map(en => ({
+          title:(en.querySelector("title")?.textContent||"").trim(),
+          link:(en.querySelector("link")?.getAttribute("href")||"").trim(),
+          pubDate:(en.querySelector("updated")?.textContent||en.querySelector("published")?.textContent||"").trim(),
+          description:(en.querySelector("summary")?.textContent||"").trim(),
+        }));
+        if(entries.length) return entries;
+        throw new Error("no items");
+      }catch(e){
+        try{
+          const apiUrl = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url);
+          const res2 = await withTimeout(fetch(apiUrl, {cache:"force-cache"}), 1200);
+          if(!res2.ok) return [];
+          const json = await res2.json();
+          return Array.isArray(json.items) ? json.items.map(x => ({
+            title:x.title, link:x.link, pubDate:x.pubDate||x.pubdate||"", description:x.description||""
+          })) : [];
+        }catch(_){ return []; }
+      }
+    }
+    function cleanText(t){ return (t||"").replace(/<[^>]+>/g," ").replace(/&[a-z]+;/gi," ").replace(/\s+/g," ").trim(); }
+    function makeSubdesc(desc){ const t=cleanText(desc); return t.length>60 ? t.slice(0,60)+'...' : t; }
+    function isSameDate(pubDate, selectedYMD){
+      const d = new Date(pubDate);
+      if (isNaN(d)) return false;
+      const sel = new Date(selectedYMD + "T00:00:00+09:00");
+      const diff = Math.abs((d.getTime() - sel.getTime()) / 86400000);
+      return diff <= 1;
+    }
+    function renderSection(container, category, items, selectedDate){
+      const maxCount = category==="제조업 소식" ? 10 : 5;
+      let count=0; const seen=new Set();
+      const section=document.createElement("section");
+      section.innerHTML = `<h3 class="brand-section-title text-lg">${category}</h3>`;
+      for(const item of items){
+        if(count>=maxCount) break;
+        if(!isSameDate(item.pubDate || item.published || item.updated, selectedDate)) continue;
+        const title=(item.title||"").trim(), link=(item.link||"").trim(), desc=item.description||"";
+        const key=(title.replace(/\s+/g,""))+(link||""); if(!title || !link || seen.has(key)) continue; seen.add(key);
+        const card=document.createElement("div");
+        card.className="brand-card p-4";
+        card.innerHTML=`
+          <a href="${link}" target="_blank" class="text-[var(--brand-primary)] font-bold hover:underline block mb-1">${title}</a>
+          <p class="text-sm brand-sub">${makeSubdesc(desc)}</p>
+        `;
+        section.appendChild(card); count++;
+      }
+      if(count===0){ section.innerHTML += `<p class="brand-sub">해당 날짜에 기사가 없습니다.</p>`; }
+      const divider=document.createElement("div"); divider.className="brand-divider mt-6 mb-8";
+      container.appendChild(section); container.appendChild(divider);
+    }
+    async function loadAllNews(){
+      const ymd = document.querySelector('#datePicker').value;
+      const container = document.querySelector('#news-container'); container.innerHTML='';
+      const skeletons = {};
+      for (const cat of Object.keys(feeds)){ skeletons[cat] = renderSkeleton(cat); container.appendChild(skeletons[cat]); }
+      await Promise.all(Object.entries(feeds).map(async ([category, url])=>{
+        const key = newsKey(category, ymd);
+        let items = null;
+        const cached = sessionStorage.getItem(key);
+        if(cached){ items = JSON.parse(cached); }
+        else { items = await fetchRSSItems(url); sessionStorage.setItem(key, JSON.stringify(items)); }
+        container.replaceChild(document.createElement('div'), skeletons[category]);
+        renderSection(container, category, Array.isArray(items)?items:[], ymd);
+      }));
+    }
+
+    /* ---------- Boot ---------- */
+    document.querySelector('#year').textContent = new Date().getFullYear();
+    async function boot(){
+      document.querySelector('#datePicker').value = toKSTYMD(new Date());
+      try { await loadMenusFromSheet(); }
+      catch(e){ console.error('[menus] load failed', e); document.querySelector('#todayMenu').innerHTML = `<div class="brand-sub">식단 시트 불러오기 실패: ${String(e.message||e)}</div>`; }
+      try { await loadAllergyMetaFromSheet(); } catch(e){ console.error('[allergy_meta] load failed', e); }
+      try { await loadNutritionistFromSheet(); }catch(e){ console.error('[nutritionist] load failed', e); }
+      try { await loadSettings(); }             catch(e){ console.error('[settings] load failed', e); }
+      switchMenuTab('today'); renderWeekMeals(); loadAllNews();
+      document.querySelector('#newsSearchBtn').addEventListener('click', loadAllNews, {passive:true});
+    }
+    boot();
+  </script>
+</body>
+</html>
+
