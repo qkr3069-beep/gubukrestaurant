@@ -131,8 +131,10 @@
       return `${y}-${m}-${d}`;
     }
     function addDaysYMD(ymd, n){ const dt=parseYMD(ymd); dt.setDate(dt.getDate()+n); return toKSTYMD(dt); }
-    function mondayOfWeekYMD(ymd){ const dt=parseYMD(ymd); const dow=dt.getDay()===0?7:dt.getDay(); dt.setDate(dt.getDate()-(dow-1)); return toKSTYMD(dt); }
-    const weekdayKoByYMD = ymd => ['일','월','화','수','목','금','토'][parseYMD(ymd).getDay()];
+    function mondayOfWeekYMD(ymd){const base=Date.parse(ymd+"T12:00:00+09:00"); const dow=new Date(base).getUTCDay(); const delta = (dow + 6) % 7; const mon=new Date(base-delta*86400000);
+    return toKSTYMD(mon);}
+
+    function weekdayKoByYMD(ymd){const base=Date.parse(ymd+"T12:00:00+09:00"); const dow=new Date(base).getUTCDay(); return ['일','월','화','수','목','금','토'][dow];};
 
     /* ---------- Google Sheet (Opensheet API) ---------- */
     const SHEET_ID = "1rCvPHw5J1wOegVBJaN6oZwtZHZDTKo30CtTM-AfbUQg";
@@ -398,9 +400,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
