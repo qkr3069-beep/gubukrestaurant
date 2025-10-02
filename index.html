@@ -275,6 +275,11 @@
         card.innerHTML=header+body; container.appendChild(card);
       }
     }
+   function renderDietitianMessage(){const todayYMD = toKSTYMD(new Date()); const msgs = window.NUTRITIONIST_MESSAGES || []; const todayOne = msgs.find(n => n.date === todayYMD);
+    const latest   = [...msgs].sort((a,b)=> a.date < b.date ? 1 : -1)[0];
+    const pick = todayOne || latest; if (pick){document.querySelector('#nutriDateChip').textContent = (pick.date||'').replace(/-/g,'.'); document.querySelector('#nutriMessage').textContent   = pick.message || '';
+    document.querySelector('#nutriMeta').textContent      = pick.author ? `작성: ${pick.author}` : '';
+  } else {document.querySelector('#nutriDateChip').textContent = ''; document.querySelector('#nutriMessage').textContent  = '아직 등록된 메시지가 없습니다.'; document.querySelector('#nutriMeta').textContent = '';}}
     function switchMenuTab(to){
       if(to==='today'){
         $('#tabToday').setAttribute('aria-selected','true'); $('#tabWeek').setAttribute('aria-selected','false');
@@ -393,7 +398,7 @@
       try { await loadAllergyMetaFromSheet(); } catch(e){ console.error('[allergy_meta] load failed', e); }
       try { await loadNutritionistFromSheet(); }catch(e){ console.error('[nutritionist] load failed', e); }
       try { await loadSettings(); }             catch(e){ console.error('[settings] load failed', e); }
-      switchMenuTab('today'); renderWeekMeals(); loadAllNews();
+      switchMenuTab('today'); renderWeekMeals(); renderDietitianMessage(); loadAllNews();
       document.querySelector('#newsSearchBtn').addEventListener('click', loadAllNews, {passive:true});
     }
     boot();
