@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -30,7 +31,6 @@
   </style>
 </head>
 <body class="min-h-screen">
-  <!-- Header -->
   <header class="brand-header">
     <div class="max-w-6xl mx-auto px-5 py-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -45,14 +45,11 @@
     <div class="brand-divider max-w-6xl mx-auto px-5"></div>
   </header>
 
-  <!-- Main -->
   <main class="max-w-6xl mx-auto px-5 py-6 space-y-10">
-    <!-- Ad banner -->
     <a class="ad-banner block" id="adLink" href="https://omnicare.biz/service/service.php" target="_blank" rel="noopener">
       <img referrerpolicy="no-referrer" src="https://github.com/qkr3069-beep/gubukrestaurant/blob/main/%EC%8A%A4%ED%82%A8_2.jpg?raw=true" alt="광고 배너">
     </a>
 
-    <!-- Menu -->
     <section id="menu" class="space-y-4">
       <h2 class="brand-section-title text-xl">식단</h2>
       <div class="flex items-center gap-2">
@@ -92,7 +89,6 @@
       </div>
     </section>
 
-    <!-- Dietitian -->
     <section id="dietitian" class="space-y-4">
       <h2 class="brand-section-title text-xl">영양사의 한마디</h2>
       <div class="brand-card p-5">
@@ -105,7 +101,6 @@
       </div>
     </section>
 
-    <!-- NEWS -->
     <section id="news" class="space-y-4">
       <h2 class="brand-section-title text-xl">NEWS — 제조업 · 경제 · 사회</h2>
       <div class="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -116,7 +111,6 @@
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="mt-10">
     <div class="brand-divider max-w-6xl mx-auto px-5"></div>
     <div class="max-w-6xl mx-auto px-5 py-6 flex items-center gap-3">
@@ -140,7 +134,7 @@
     function mondayOfWeekYMD(ymd){ const dt=parseYMD(ymd); const dow=dt.getDay()===0?7:dt.getDay(); dt.setDate(dt.getDate()-(dow-1)); return toKSTYMD(dt); }
     const weekdayKoByYMD = ymd => ['일','월','화','수','목','금','토'][parseYMD(ymd).getDay()];
 
-    /* ---------- Google Sheet (Opensheet API: CORS OK) ---------- */
+    /* ---------- Google Sheet (Opensheet API) ---------- */
     const SHEET_ID = "1rCvPHw5J1wOegVBJaN6oZwtZHZDTKo30CtTM-AfbUQg";
     const OS = tab => `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(tab)}?_=${Date.now()}`;
 
@@ -214,36 +208,31 @@
         legend.appendChild(span);
       });
     }
-    function findClosestMenu(targetYMD){
-      const menus = (window.MENUS||[]).filter(x=>x.date);
-      if (!menus.length) return {hit:null, closest:null};
-      const diff = (a,b) => Math.abs(parseYMD(a) - parseYMD(b));
-      const hit = menus.find(m => m.date === targetYMD) || null;
-      const closest = [...menus].sort((a,b)=> diff(a.date, targetYMD) - diff(b.date, targetYMD))[0] || null;
-      return {hit, closest};
-    }
+
+    /* ---------- STRICT: 오늘은 '정확히 오늘 날짜'만 노출 ---------- */
     function renderToday(){
       const todayYMD = toKSTYMD(new Date());
-      const {hit, closest} = findClosestMenu(todayYMD);
-      let data = hit;
-      if(!data && closest){
-        const dayDiff = Math.abs((parseYMD(closest.date) - parseYMD(todayYMD)) / 86400000);
-        if (dayDiff <= 1) data = closest;
-      }
+      const data = (window.MENUS||[]).find(m => m.date === todayYMD) || null;
+
       const menuBox = $('#todayMenu'); menuBox.innerHTML='';
-      if(!data){
-        menuBox.innerHTML = `<div class="brand-sub">오늘의 식사가 아직 등록되지 않았습니다.</div>`;
-      }else{
-        const parts = String(data.items||'').split(/\||,|·|\r?\n/).map(s=>s.trim()).filter(Boolean);
-        parts.forEach(item=>{
-          const el=document.createElement('div'); el.className='flex items-start gap-2';
-          el.innerHTML = `<span class="mt-[3px]">•</span><span>${item}</span>`;
-          menuBox.appendChild(el);
-        });
-      }
       const status=$('#todayAllergyStatus'), detected=$('#todayAllergyDetected'), list=$('#todayAllergyList');
       detected.innerHTML=''; list.innerHTML='';
-      const tags=(data && data.allergy_tags ? String(data.allergy_tags).split(',') : []).map(s=>s.trim()).filter(Boolean);
+
+      if(!data){
+        menuBox.innerHTML = `<div class="brand-sub">오늘(${todayYMD}) 식단은 아직 <b>미정</b>입니다.</div>`;
+        status.textContent = '미정';
+        renderLegend();
+        return;
+      }
+
+      const parts = String(data.items||'').split(/\||,|·|\r?\n/).map(s=>s.trim()).filter(Boolean);
+      parts.forEach(item=>{
+        const el=document.createElement('div'); el.className='flex items-start gap-2';
+        el.innerHTML = `<span class="mt-[3px]">•</span><span>${item}</span>`;
+        menuBox.appendChild(el);
+      });
+
+      const tags=(data.allergy_tags ? String(data.allergy_tags).split(',') : []).map(s=>s.trim()).filter(Boolean);
       if(!tags.length){
         status.textContent='표시 없음';
         list.innerHTML=`<div class="brand-sub">등록된 알레르기 표시가 없습니다. 아이콘 안내를 참고해 주세요.</div>`;
@@ -260,6 +249,7 @@
       }
       renderLegend();
     }
+
     function renderWeekMeals(){
       const container=$('#weekList'); container.innerHTML='';
       const todayYMD=toKSTYMD(new Date()); const monYMD=mondayOfWeekYMD(todayYMD);
@@ -295,7 +285,7 @@
     $('#tabToday').addEventListener('click', ()=> switchMenuTab('today'));
     $('#tabWeek').addEventListener('click',  ()=> switchMenuTab('week'));
 
-    /* ---------- NEWS (fast + cached) ---------- */
+    /* ---------- NEWS (빠른 로딩 버전: 동일) ---------- */
     const feeds = {
       "주요 소식(국내)": "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko",
       "주요 소식(국외)": "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en",
@@ -408,6 +398,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
