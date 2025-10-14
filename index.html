@@ -122,20 +122,48 @@
   <script>
     const $ = s => document.querySelector(s);
 
-    /* ---------- KST date helpers ---------- */
-    function parseYMD(ymd){ const [y,m,d]=(ymd||'').split('-').map(Number); return new Date(y,(m||1)-1,d||1,0,0,0,0); }
-    function toKSTYMD(date){
-      const utc = date.getTime() + (date.getTimezoneOffset()*60000);
-      const kst = new Date(utc + 9*3600000);
-      const y=kst.getUTCFullYear(), m=String(kst.getUTCMonth()+1).padStart(2,'0'), d=String(kst.getUTCDate()).padStart(2,'0');
-      return `${y}-${m}-${d}`;
-    }
-    function addDaysYMD(ymd, n){ const dt=parseYMD(ymd); dt.setDate(dt.getDate()+n); return toKSTYMD(dt); }
-    function mondayOfWeekYMD(ymd){const base=Date.parse(ymd+"T12:00:00+09:00"); const dow=new Date(base).getUTCDay(); const delta = (dow + 6) % 7; const mon=new Date(base-delta*86400000);
-    return toKSTYMD(mon);}
+ /* ---------- KST utils (robust) ---------- */
+/* YYYY-MM-DD 포맷러 (KST) */
+const fmtKST = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric', month: '2-digit', day: '2-digit'
+});
 
-    function weekdayKoByYMD(ymd){const base=Date.parse(ymd+"T12:00:00+09:00"); const dow=new Date(base).getUTCDay(); return ['일','월','화','수','목','금','토'][dow];};
+/** Date -> 'YYYY-MM-DD' (KST) */
+function toKSTYMD(date) {
+  return fmtKST.format(date);
+}
 
+/** 'YYYY-MM-DD' -> Date (KST 정오 기준으로 안전 파싱) */
+function parseYMD(ymd) {
+  const [y, m, d] = (ymd || '').split('-').map(Number);
+  // UTC 03:00 ≈ KST 12:00 - 9h (DST 영향 없이 날짜만 다루기 위함)
+  return new Date(Date.UTC(y, (m || 1) - 1, d || 1, 3, 0, 0));
+}
+
+/** 'YYYY-MM-DD' + n일 (KST 기준) -> 'YYYY-MM-DD' */
+function addDaysYMD(ymd, n) {
+  const dt = parseYMD(ymd);
+  dt.setUTCDate(dt.getUTCDate() + n);
+  return toKSTYMD(dt);
+}
+
+/** 주의 월요일(월=0)을 'YYYY-MM-DD'(KST)로 반환 */
+function mondayOfWeekYMD(ymd) {
+  const base = new Date(ymd + 'T12:00:00+09:00'); // KST 정오
+  const dow = base.getUTCDay();                   // 0(일)~6(토)
+  const delta = (dow + 6) % 7;                    // 월요일을 0으로 평준화
+  base.setUTCDate(base.getUTCDate() - delta);
+  return toKSTYMD(base);
+}
+
+/** 'YYYY-MM-DD'의 요일 한글 약칭('월','화',…) */
+function weekdayKoByYMD(ymd) {
+  const base = new Date(ymd + 'T12:00:00+09:00'); // KST 정오
+  return new Intl.DateTimeFormat('ko-KR', {
+    weekday: 'short', timeZone: 'Asia/Seoul'
+  }).format(base).replace('.', '');
+}
     /* ---------- Google Sheet (Opensheet API) ---------- */
     const SHEET_ID = "1rCvPHw5J1wOegVBJaN6oZwtZHZDTKo30CtTM-AfbUQg";
     const OS = tab => `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(tab)}?_=${Date.now()}`;
@@ -405,5 +433,3 @@
   </script>
 </body>
 </html>
-
-
